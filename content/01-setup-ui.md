@@ -4,7 +4,7 @@ metaTitle: "Setup User Interface"
 metaDescription: "Years back, when I started writing as a guest author for scotch.io dev blog, I was moved strongly by what we believed in as teachers."
 ---
 
-In this section, you will learn how to setup a server-side rendered React application and configure styling and Apollo properly for server-remdered apps:
+In this section, you will learn how to setup a server-side rendered React application and configure styling and Apollo properly for server-rendered apps:
 
 What you will learn:
 
