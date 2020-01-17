@@ -159,7 +159,7 @@ export default class MyDocument extends Document {
 }
 ```
 
-We now have a `render` function like every other React component, but this time we took the liberty to wrap our page content `<Main />` and page scripts `<NativeScript />` with a HTML and body tag. This way, we can inject the global styles and fonts to the `head` of the page.
+We now have a `render` function like every other React component, but this time we took the liberty to wrap our page content `<Main />` and page scripts `<NextScript />` with a HTML and body tag. This way, we can inject the global styles and fonts to the `head` of the page.
 
 Set the font-family in the style we already have in `pages/index.js` to see some changes:
 
@@ -186,7 +186,7 @@ To use it, install the `styled-reset` library:
 npm install --save styled-reset
 ```
 
-Import it in `pages/document.js` and render it’s component in the `getInitialProps` function:
+Import it in `pages/_document.js` and render it’s component in the `getInitialProps` function:
 
 ```js
 import Document, { Html, Head, Main, NextScript } from 'next/document';
