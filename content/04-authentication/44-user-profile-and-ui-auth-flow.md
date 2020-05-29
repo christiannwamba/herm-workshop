@@ -28,6 +28,10 @@ Here is what the general auth flow for the UI would look like at the end:
 Let’s start with the simpler task — allow users to click on a link to log out. Update the `Header` component in `components/Header.js` to add one more nav menu:
 
 ```js
+import { Box, Flex, LogoIcon, User, Link } from "herm";
+.
+.
+.
 function Header() {
   return (
     <Box backgroundColor="#fafafb" paddingLeft="50px" paddingRight="50px">
