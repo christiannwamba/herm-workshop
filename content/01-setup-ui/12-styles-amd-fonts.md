@@ -4,141 +4,90 @@ metaTitle: "Styles and Fonts"
 metaDescription: "Setup styled-components for a Next.js App -- setup fonts -- add reset.css"
 ---
 
-Next.js has a bundled styling framework, [styled-jsx](https://github.com/zeit/styled-jsx). `styled-jsx` would work fine but for the sake of popularity and familiarity, I decided to go with [styled-components](http://styled-components.com/).
+Next.js has a bundled styling framework, [styled-jsx](https://github.com/zeit/styled-jsx). `styled-jsx` would work fine but for the sake of simplicity, I decided to go with [Chakra UI](https://chakra-ui.com).
 
-Styled components have two major syntaxes that you should care about:
+Chakra UI is a modular and accessible component library that gives you all the building blocks you need to build React applications.
+
+If you wanted to create a flex box with some alignment, it will be as straightforward as the following
 
 ```js
-import styled from 'styled-components'
+// Import Flex from Chakra
+import { Flex } from "@chakra-ui/core";
 
-// 1. Styling primities
-const Box = styled.div`
-  height: 50px
-` // Box becomes a React component
-
-// 2. Styling components
-const Card = styled(Box)`
-  border-radius: 8px
-` // Card becomes a React Component as well
+// Create a Flex
+<Flex alignItems="center" justifyContent="center">
+  
+</Flex>;
 ```
 
+My favorite Chakra feature is the ability to define responsive styles with array:
+
+```js
+<Box
+  bg="teal.400"
+  width={[
+    "100%", // base
+    "50%", // 480px upwards
+    "25%", // 768px upwards
+    "15%", // 992px upwards
+  ]}
+/>;
+{
+  /* responsive font size */
+}
+<Box fontSize={["sm", "md", "lg", "xl"]}>Font Size</Box>;
+```
 
 ## Objectives
 
-
-- Setup styled-components for a Next.js App
-- Configure SSR for styles
+- Setup Chakra UI for a Next.js App
 - Add a Google font
-- Add a CSS reset
-
+- Add a CSS reset and theme
 
 ## Exercise 1: Setup Styled Components
 
-Install `styled-components` via npm:
+Install Chakra and emotion via npm:
 
 ```bash
-npm install --save styled-components
+npm install @chakra-ui/core @emotion/core @emotion/styled emotion-theming react-icons
 ```
-
 
 Replace the content of `pages/index.js` with:
 
 ```js
-import React from 'react'
-import styled from 'styled-components'
+import React from 'react';
+import { Text } from '@chakra-ui/core';
 
-const Title = styled.h1`
-  font-size: 40px;
-  color: rebeccapurple;
-`
+function Index() {
+  return (
+    <Text fontSize="40px" color="rebeccapurple" as="h1">
+      Hello, Herm!
+    </Text>
+  );
+}
 
-export default () => <Title>Hello, Herm</Title>
+export default Index;
 ```
 
-Instead of just h1, we are returning a *styled h1* named `Title`. Reload the page at `3000` and you should see no difference in styling:
-
-
-![](https://paper-attachments.dropbox.com/s_AA9C598A3927718DF41EFCCB3BCF89597B4CC6A74B2279E11E482C3DF767D3C9_1578913080586_image.png)
-
-
-Now the mind-bugging thing that throws beginners off is that when you update the code, and hot-reload happens, the style gets applied:
-
+You should get a nicely colored header.
 
 ![](https://paper-attachments.dropbox.com/s_AA9C598A3927718DF41EFCCB3BCF89597B4CC6A74B2279E11E482C3DF767D3C9_1578913168473_image.png)
 
+## Exercise 2: Add a Google font
 
-Here's what is happening. When you do a reload, you are going to the server and asking it for what it’s got. Next.js, which has a server running, will give you the page, but what it does not do is also to inject the styles you added with styled-components.
-
-Why does it work when you update the code, though? Hot module replacement happens, and as the name says, it’s a *replacement* not a *reload*. What this implies is that during replacement, React will run only on the client-side, and whatever client code available will pass too. Therefore, React knows about your client styles, but Next.js does not. We need to tell Next.js.
-
-
-## Exercise 2: Configure SSR for styles
 
 Next.js has special files that can live in the `pages` folder but are not actual pages. Instead, they wrap pages before Next.js serves those pages from the server:
 
-
-1. `_document.js`  is used to define your own custom HTML and body tags. It is useful for injecting styles and fonts to your *actual* pages.
+1. `_document.js` is used to define your own custom HTML and body tags. It is useful for injecting styles and fonts to your _actual_ pages.
 2. `_app.js`: Is used to initialize pages. It is useful when you want to do things like maintaining states between two pages, global error handling, retaining layouts across pages, etc.
 
-Since we want to inject styles to the pages on the server, what we need right now is a `pages/_document.js`. Create one and add the following:
+Since we want to inject styles to the pages, what we need right now is a `pages/_document.js`. Create one and add the following:
+
 
 ```js
-import Document from 'next/document'
-import { ServerStyleSheet } from 'styled-components'
+import Document, { Html, Head, Main, NextScript } from "next/document";
 
 export default class MyDocument extends Document {
-  static async getInitialProps(ctx) {
-    const sheet = new ServerStyleSheet()
-    const originalRenderPage = ctx.renderPage
-
-    try {
-      ctx.renderPage = () =>
-        originalRenderPage({
-          enhanceApp: App => props => sheet.collectStyles(<App {...props} />),
-        })
-
-      const initialProps = await Document.getInitialProps(ctx)
-      return {
-        ...initialProps,
-        styles: (
-          <>
-            {initialProps.styles}
-            {sheet.getStyleElement()}
-          </>
-        ),
-      }
-    } finally {
-      sheet.seal()
-    }
-  }
-}
-```
-
-You also need to tell babel that styled-component wants to be used in SSR mode by updating the `.babelrc` code with the following:
-
-```json
-{
-  "presets": ["next/babel"],
-  "plugins": [["graphql-tag"], ["styled-components", { "ssr": true }]]
-}
-```
-
-You will still not notice any difference when you reload, but once you kill the running app process (CTRL + C) and run `npm run dev` again, things will start working as expected.
-
-
-## Exercise 3: Add a Google font
-
-We mentioned that `_document.js` is also a great place for placing global styles, let’s take advantage of that to add a global font file:
-
-```js
-import Document, { Html, Head, Main, NextScript } from 'next/document';
-import { ServerStyleSheet } from 'styled-components';
-
-export default class MyDocument extends Document {
-  static async getInitialProps(ctx) {
-    // CSS SSR...
-  }
-
   render() {
     return (
       <Html>
@@ -159,81 +108,117 @@ export default class MyDocument extends Document {
 }
 ```
 
-We now have a `render` function like every other React component, but this time we took the liberty to wrap our page content `<Main />` and page scripts `<NextScript />` with a HTML and body tag. This way, we can inject the global styles and fonts to the `head` of the page.
+We now have a `render` function like every other React component, but this time we took the opportunity to wrap our page content `<Main />` and page scripts `<NextScript />` with a HTML and body tag. This way, we can inject the global styles and fonts to the `head` of the page.
 
 Set the font-family in the style we already have in `pages/index.js` to see some changes:
 
 ```js
-const Title = styled.h1`
-  font-size: 40px;
-  color: rebeccapurple;
-  font-family: 'Nunito', sans-serif;
+function Index() {
+  return (
+    <Text fontSize="40px" color="rebeccapurple" as="h1" fontFamily="'Nunito', sans-serif">
+      Hello, Herm!
+    </Text>
+  );
+}
 ```
 
 Here you go:
 
 ![](https://paper-attachments.dropbox.com/s_AA9C598A3927718DF41EFCCB3BCF89597B4CC6A74B2279E11E482C3DF767D3C9_1578915480006_image.png)
 
-## Exercise 4: Add a CSS reset
+## Exercise 3: Theming and CSS Reset
 
-We have some styling defaults that we don’t need — things like margins around our headings or padding in the body. We want to take full control of everything by resetting everything to 0 or its equivalent.
+We have some styling defaults that we don’t need — things like margins around our headings or padding in the body. We want to take full control of everything by resetting everything to 0 or its equivalent. 
 
-[styled-reset](https://github.com/zacanger/styled-reset) is a library that works together with styled-components to reset your CSS based on [Meyer’s reset code](https://www.google.com/search?client=safari&rls=en&q=css+reset&ie=UTF-8&oe=UTF-8).
+Chakra also give you a smooth API to define themes as a global object. With themes you don't have to always remember how to spell your font name or what your primary color is.
 
-To use it, install the `styled-reset` library:
+We can define both themes and CSS reset in the `pages/_app.js` file.
 
-```bash
-npm install --save styled-reset
-```
-
-Import it in `pages/_document.js` and render it’s component in the `getInitialProps` function:
+To do so, create `pages/_app.js` with the following:
 
 ```js
-import Document, { Html, Head, Main, NextScript } from 'next/document';
-import { ServerStyleSheet } from 'styled-components';
+import React from 'react';
+import NextApp from 'next/app';
+import { ThemeProvider, CSSReset } from '@chakra-ui/core';
+import { theme } from '@chakra-ui/core';
 
-// Import styled-reset
-+ import { Reset } from 'styled-reset';
+const customIcons = {
+  logo: {
+    path: (
+      <path
+        fill="currentColor"
+        d="..." // Full path here: 
+      />
+    ),
+    viewBox: '0 0 230 40',
+  },
+};
 
-export default class MyDocument extends Document {
-  static async getInitialProps(ctx) {
-    const sheet = new ServerStyleSheet();
-    const originalRenderPage = ctx.renderPage;
+const customTheme = {
+  ...theme,
+  fonts: {
+    body: "Nunito, system-ui, sans-serif",
+  },
+  icons: {
+    ...theme.icons,
+    ...customIcons,
+  },
+  colors: {
+    ...theme.colors,
 
-    try {
-      ctx.renderPage = () =>
-        originalRenderPage({
-          enhanceApp: App => props => sheet.collectStyles(<App {...props} />)
-        });
+    gray: {
+      ...theme.colors.gray,
+      100: '#FAFAFB',
+    },
+    brand: {
+      50: '#ffe2fc',
+      100: '#ffb1e8',
+      200: '#ff7fd7',
+      300: '#ff4cc6',
+      400: '#ff1ab5',
+      500: '#e6009c',
+      600: '#b40079',
+      700: '#810058',
+      800: '#500035',
+      900: '#1f0014',
+    },
+  },
+};
 
-      const initialProps = await Document.getInitialProps(ctx);
-      return {
-        ...initialProps,
-        styles: (
-          <>
-+           <Reset />
-            {initialProps.styles}
-            {sheet.getStyleElement()}
-          </>
-        )
-      };
-    } finally {
-      sheet.seal();
-    }
-  }
-
+class App extends NextApp {
   render() {
-    //...    
+    const { Component } = this.props;
+    return (
+      <ThemeProvider theme={customTheme}>
+        <CSSReset />
+        <Component />
+      </ThemeProvider>
+    );
   }
 }
+
+export default App;
+
 ```
+
+First we imported the necessary npm modules, then we created a theme object for our styles. Finally, we pass the theme to `ThemeProvider` which is used to wrap our web pages. Not that we also imported `CSSReset` from Chakra to reset the default the styles.
 
 Restart the app again and take another look:
 
-
 ![](https://paper-attachments.dropbox.com/s_AA9C598A3927718DF41EFCCB3BCF89597B4CC6A74B2279E11E482C3DF767D3C9_1578917420822_image.png)
-
 
 No more surprises!
 
+Try updating your styles `index.js` page to see the wonders of theming:
 
+```javascript
+function Index() {
+  return (
+    <Text fontSize="40px" color="brand.500" as="h1">
+      Hello, Herm!
+    </Text>
+  );
+}
+```
+
+`color` now points to the 500 brand color we defined in the theme and we also removed font family since it has been defined in the them object as well.

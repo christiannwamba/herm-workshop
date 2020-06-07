@@ -9,7 +9,6 @@ We have a project set up, and we are ready to start fleshing out the app UI. Fir
 
 ## Objectives
 
-- Install `herm`'s UI library
 - Create a layout component
 - Add a header and a sidebar
 
@@ -22,7 +21,7 @@ Add a `components/Layout.js` file with the following content:
 
 ```js
 import React from 'react';
-import { Box, Flex } from 'herm';
+import { Box, Flex } from '@chakra-ui/core';
 
 import Header from './Header';
 import Sidebar from './Sidebar';
@@ -43,28 +42,20 @@ function Layout({ children }) {
 export default Layout;
 ```
 
-At this point, you are wondering what the `herm` library is and where the `Header`, `Sidebar`, and `Main` components are coming from. Let’s dig into those.
-
-While I was creating this workshop, I did not want you to spend so much time on styling elements, so I took the liberty and created a set of UI components that you can import, add props and you have a good looking interface.
-
-I created and published them on npm as `herm` so go ahead and install in your app with:
-
-```bash
-npm install --save herm
-```
-
 To see this layout in action, update your `pages/index.js` to make use of it:
 
 ```js
 import React from 'react';
-import { Text } from 'herm';
+import { Text } from '@chakra-ui/core';
 
 import Layout from '../components/Layout';
 
 function Index() {
   return (
     <Layout>
-      <Text fontSize="32px">Hello, Herm</Text>
+      <Text fontSize="40px" color="brand.500" as="h1">
+        Hello, Herm!
+      </Text>
     </Layout>
   );
 }
@@ -72,7 +63,7 @@ function Index() {
 export default Index;
 ```
 
-Things should blow up with error since some components being used are yet to be created.
+The app should blow up with error since some components being used are yet to be created.
 
 ## Exercise 2: Create app shell components
 
@@ -83,62 +74,106 @@ Create a `Header` component by adding the following in a `components/Header.js` 
 ```js
 import React from 'react';
 
-import { Box, Flex, LogoIcon, User } from 'herm';
+import { Box, Flex, Icon, Avatar, Text } from '@chakra-ui/core';
 
 function Header() {
   return (
     <Box backgroundColor="#fafafb" paddingLeft="50px" paddingRight="50px">
       <Flex alignItems="center" justifyContent="space-between" height="50px">
-        <LogoIcon></LogoIcon>
+        <Box bg="gray.200" rounded="full">
+          <Icon
+            name="logo"
+            color="brand.500"
+            width="40px"
+            height="40px"
+            viewBox="0 0 40 40"
+          ></Icon>
+        </Box>
         <User
           username="Christian Nwamba"
-          sub="Scheduled for 16th December at 09:30 AM"
-        >
-          <Flex alignItems="center">
-            <Box>
-              <User.Avatar></User.Avatar>
-            </Box>
-            <Box marginLeft="12px">
-              <User.Username></User.Username>
-            </Box>
-          </Flex>
-        </User>
+          // sub="Scheduled for 16th December at 09:30 AM"
+        ></User>
       </Flex>
     </Box>
   );
 }
 
+function User({ avatar, sub, username }) {
+  return (
+    <Flex alignItems="center">
+      <Box>
+        <Avatar size="sm" name={username} src={avatar} />
+      </Box>
+      {username && (
+        <Box marginLeft="12px">
+          <Text fontWeight="bold">{username}</Text>
+          {sub && <Text fontSize="12px">{sub}</Text>}
+        </Box>
+      )}
+    </Flex>
+  );
+}
+
 export default Header;
 ```
- 
+
+The `Header` component also renders a `User` component. The `User` component is a component that shows the user avatar and the user name when a user is logged in. For now we are just rendering static content.
 
 Create a `Sidebar` component by adding the following in a `components/Sidebar.js` file:
 
 ```js
 import React from 'react';
-import { Box, Nav, NavItem, ScheduleIcon, FeedsIcon, ProfileIcon } from 'herm';
+import { Box, Flex, Text } from '@chakra-ui/core';
+import { FaRegClock, FaRegListAlt, FaRegUser } from 'react-icons/fa';
 
 function Sidebar() {
   return (
     <Box
-      backgroundColor="#fafafb"
+      bg="#fafafb"
       height="100vh"
       width="270px"
-      paddingTop="40px"
-      paddingLeft="30px"
-      paddingRight="30px"
+      pt="40px"
+      pl="30px"
+      pr="30px"
     >
-      <Nav>
-        <NavItem Icon={FeedsIcon}>Feeds</NavItem>
-        <NavItem Icon={ScheduleIcon}>Schedule</NavItem>
-        <NavItem Icon={ProfileIcon}>Account</NavItem>
-      </Nav>
+      <NavItem Icon={FaRegListAlt}>Feeds</NavItem>
+      <NavItem Icon={FaRegClock}>Schedule</NavItem>
+      <NavItem Icon={FaRegUser}>Account</NavItem>
     </Box>
+  );
+}
+
+function NavItem({ Icon, href = '#', children }) {
+  const [mouseOver, setMouseOver] = React.useState(false);
+
+  return (
+    <a display="block" href={href}>
+      <Flex
+        alignItems="center"
+        height="45px"
+        bg={mouseOver && 'rgba(224, 0, 152, 0.1)'}
+        cursor={mouseOver ? 'pointer' : 'default'}
+        onMouseEnter={() => setMouseOver(true)}
+        onMouseLeave={() => setMouseOver(false)}
+        rounded="md"
+        pt="10px"
+        pb="10px"
+        pl="20px"
+        pr="20px"
+      >
+        <Box marginRight="10px">
+          <Icon fill={mouseOver ? '#E00098' : '#364067'}></Icon>
+        </Box>
+        <Text color={mouseOver ? '#E00098' : '#364067'}>{children}</Text>
+      </Flex>
+    </a>
   );
 }
 
 export default Sidebar;
 ```
+
+The sidebar component also renders a list of navigation items.
 
 Create a `Main` component by adding the following in a `components/Main.js` file:
 
@@ -159,7 +194,6 @@ export default Main;
 
 Once you save all these and take another look at your browser, you will see that we are making good progress:
 
-
-![](https://paper-attachments.dropbox.com/s_1F0ED8DFFEEF1F84DC761018FF646494DFA8F39DF8A1956D7C3FDB86DC604B3D_1579006575893_image.png)
+![App shell](https://res.cloudinary.com/codebeast/image/upload/v1591523886/CleanShot_2020-06-07_at_13.57.51_2x.png)
 
 
