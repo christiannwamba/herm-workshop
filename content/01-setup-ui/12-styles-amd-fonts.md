@@ -136,6 +136,8 @@ We can define both themes and CSS reset in the `pages/_app.js` file.
 
 To do so, create `pages/_app.js` with the following:
 
+(Full path for logo is truncated in the code below but you can copy here: Full path here: https://gist.github.com/christiannwamba/b73cc2628aff51789f82fb870c0092ae)
+
 ```js
 import React from 'react';
 import NextApp from 'next/app';
@@ -147,7 +149,7 @@ const customIcons = {
     path: (
       <path
         fill="currentColor"
-        d="..." // Full path here: 
+        d="..." // Full path here: https://gist.github.com/christiannwamba/b73cc2628aff51789f82fb870c0092ae
       />
     ),
     viewBox: '0 0 230 40',
