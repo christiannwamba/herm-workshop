@@ -13,6 +13,28 @@ metaTitle: "Authenticated Queries from Next.js App"
 
 In the beginning, when we set up the Next.js project, we used the Apollo GraphQL template. This setup installed Apollo and GraphQL libraries and even added a server-rendering logic for GraphQL queries in `lib/apollo.js`. Let’s use Apollo to fetch accounts from our protected GraphQL API.
 
+**Task 0: Install GraphQL Dependencies**
+
+Install all the GraphQL npm module that we need to use Apollo. Update the `dependencies` property in your `package.json` file:
+
+```json
+{
+  "@apollo/react-hooks": "3.0.0",
+  "@apollo/react-ssr": "3.0.0",
+  "apollo-cache-inmemory": "1.6.3",
+  "apollo-client": "2.6.4",
+  "apollo-link-http": "1.5.15",
+  "graphql": "^14.0.2",
+  "graphql-tag": "2.10.1",
+}
+```
+
+Install the dependencies:
+
+```javascript
+npm install
+```
+
 **Task 1: Create an Account Component**
 
 First create an `Account` component in `components/Account`:
@@ -96,7 +118,43 @@ const Account = () => {
 
 Note that if there was a valid response, there is a possibility that the payload is empty and just sends an empty array. In that case, we should handle by checking the length of the response payload, `data.account.length`.
 
-**Task 2: Setup Home Page for Apollo**
+**Task 2: Setup SSR for Apollo**
+
+Create a `lib` folder at the root of your folder and add a `apollo.js` file inside the `lib` folder. Apollo needs extra configuration before it can render your queries to the server and that configuration is what you should put in the `apollo.js` file:
+
+```javascript
+import React from 'react'
+import { ApolloProvider } from '@apollo/react-hooks'
+import { ApolloClient } from 'apollo-client'
+import { InMemoryCache } from 'apollo-cache-inmemory'
+import { HttpLink } from 'apollo-link-http'
+import withApollo from 'next-with-apollo';
+
+export default withApollo(
+  ({ initialState }) => {
+    return new ApolloClient({
+      link: new HttpLink({
+        uri: `${process.env.BASE_URL}/api/graphql`,
+        credentials: 'same-origin'
+      }),
+      cache: new InMemoryCache().restore(initialState || {})
+    });
+  },
+  {
+    render: ({ Page, props }) => {
+      return (
+        <ApolloProvider client={props.apollo}>
+          <Page {...props} />
+        </ApolloProvider>
+      );
+    }
+  }
+);
+```
+
+For each page that needs to use GraphQL data, we have to wrap it with `withApollo` before exporting.
+
+**Task 4: Use Apollo SSR Setup in Home Page**
 
 To use the component, import it in the `index.js` page file:
 
@@ -128,21 +186,6 @@ function Index({ me }) {
 }
 ```
 
-The `./lib/apollo` is setup with a demo GraphQL endpoint — we need to update it to use ours. To do that, find the `createApolloClient` function and replace `uri` with your GraphQL endpoint (`http://localhost:3100/v1/graphql`):
-
-```js
-function createApolloClient(initialState = {}) {
-  return new ApolloClient({
-    ssrMode: typeof window === 'undefined',
-    link: new HttpLink({
-+     uri: `${process.env.BASE_URL}/api/graphql`,
-      credentials: 'same-origin',
-      fetch,
-    }),
-    cache: new InMemoryCache().restore(initialState),
-  })
-}
-```    
 
 If you reload the page, you should get the following error:
 
@@ -284,51 +327,7 @@ Restart the Next.js app and reload your page, you should start getting a success
 
 ![](https://paper-attachments.dropbox.com/s_1160B8630BA1CF41765159DA18D4020C2250C8909DFA5035D976331A3777F078_1584942845843_image.png)
 
-
-**Task 5: Refactor Apollo SSR Code**
-
-When I started this workshop, I did not know about the `next-with-apollo` npm library. This library will help us get rid of everything in `lib/apollo.js` and just call an imported function to setup Apollo.
-
-Delete everything in `lib/apollo.js` and replace with:
-
-```js
-import React from 'react'
-import { ApolloProvider } from '@apollo/react-hooks'
-import { ApolloClient } from 'apollo-client'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { HttpLink } from 'apollo-link-http'
-
-import withApollo from 'next-with-apollo';
-
-
-export default withApollo(
-  ({ initialState }) => {
-    return new ApolloClient({
-      link: new HttpLink({
-        uri: `${process.env.BASE_URL}/api/graphql`,
-        credentials: 'same-origin'
-      }),
-      cache: new InMemoryCache().restore(initialState || {})
-    });
-  },
-  {
-    render: ({ Page, props }) => {
-      return (
-        <ApolloProvider client={props.apollo}>
-          <Page {...props} />
-        </ApolloProvider>
-      );
-    }
-  }
-);
-```
-
-You will keep getting the same expected result:
-
-![](https://paper-attachments.dropbox.com/s_1160B8630BA1CF41765159DA18D4020C2250C8909DFA5035D976331A3777F078_1585046669330_image.png)
-
-
-**Task 6: Test Query with Real Data**
+**Task 5: Test Query with Real Data**
 
 Head back to the Hasura console and run the following query:
 
