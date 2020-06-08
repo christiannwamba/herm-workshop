@@ -67,7 +67,7 @@ The app should blow up with error since some components being used are yet to be
 
 ## Exercise 2: Create app shell components
 
-App shell components make up the layout. They include headers, sidebars, navigation, footers, etc. Anything that tends to remain the same on a dynamic shell can be considered as part of the app’s shell.
+App shell components make up the layout. They include headers, sidebars, navigation, footers, etc. Anything that tends to remain the same on a dynamic app can be considered as part of the app’s shell.
 
 Create a `Header` component by adding the following in a `components/Header.js` file:
 
@@ -179,7 +179,7 @@ Create a `Main` component by adding the following in a `components/Main.js` file
 
 ```js
 import React from 'react';
-import { Box } from 'herm';
+import { Box } from '@chakra-ui/core';
 
 function Main({ children }) {
   return (
@@ -195,5 +195,3 @@ export default Main;
 Once you save all these and take another look at your browser, you will see that we are making good progress:
 
 ![App shell](https://res.cloudinary.com/codebeast/image/upload/v1591523886/CleanShot_2020-06-07_at_13.57.51_2x.png)
-
-

@@ -13,14 +13,13 @@ What Next.js has done really well, is to give us a platform to build React apps 
 
 
 - Create a Next.js app
-- Learn how to create Next.js apps using existing templates (e.g., Apollo GraphQL template)
 
 
 ## Exercise 1: Create a Next.js App
 
-**Task 1: Download an Apollo-based Next.js App**
+**Task 1: Create App**
 
-You can either [manually](https://github.com/zeit/next.js/#manual-setup) create a Next.js app or use the `create-next-app` CLI tool. Create a project folder where you want everything regarding herm to live. 
+You can either [manually](https://github.com/zeit/next.js/#manual-setup) create a Next.js app or use the `create-next-app` CLI tool. Create a project folder where you want everything regarding herm to live.
 
 ```bash
 mkdir herm
@@ -76,7 +75,7 @@ If Next.js doesn’t find the appropriate file in the pages folder, in this case
 
 It’s also good to note that, by convention, any other component that does not map to a route should be kept in the `components` folder.
 
-Now re-create those folders, but this time with the bare minimum content:
+Now create an empty `components` and `pages`:
 
 ```bash
 # Recreate
