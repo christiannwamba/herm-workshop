@@ -1,7 +1,9 @@
 ---
-title: "2.1 Install Docker"
+title: "2.2 Install Docker"
 metaTitle: "Install Docker"
 ---
+
+> Feel free to skip this page if you are using Hasura cloud
 
 ## Objectives
 

@@ -3,6 +3,8 @@ title: "3.2 Create a Cloud-Hosted Postgres Database"
 metaTitle: "Create a Cloud-Hosted Postgres Database"
 ---
 
+> Feel free to skip this page if you are using Hasura cloud
+
 As we have seen in the previous chapters, we need a Postgres database in production, just like we had locally. This database is the source of truth for our app. It will store information about our accounts and users in the cloud.
 
 
@@ -12,9 +14,9 @@ As we have seen in the previous chapters, we need a Postgres database in product
 
 ## Exercise 1: Create a Postgres Database
 
-There are two main ways to create resources in Azure. You can either use the Azure Portal (aka. Azure Website) or use the command line. We are developers, and we love to save time and automate things using the CLI. 
+There are two main ways to create resources in Azure. You can either use the Azure Portal (aka. Azure Website) or use the command line. 
 
-In this regard, I am going to be showing you how to create resources using the terminal, but when we are done, we will take a look at the portal to confirm that these resources were successfully created.
+We are developers, and we love to save time and automate things using the CLI.  In this regard, I am going to be showing you how to create resources using the terminal, but when we are done, we will take a look at the portal to confirm that these resources were successfully created.
 
 To create a Postgres database, run the following command in the terminal:
 
@@ -34,7 +36,7 @@ Few rules to keep an eye on:
 
 - Server names must contain alphanumeric characters. No dashes or underscores
 - Passwords should comply with standard password policy — at least one number and one character. 
-- The characters that make up the passwords must not be less than 12.
+- The characters that make up the passwords must not be less than 12. I use LastPass [password generator](https://www.lastpass.com/password-generator).
 
 Replace `<server_admin_username>` with your admin username and `<server_admin_password>` with your admin password. `--sku-name` is a code name for the pricing tier. We are using one of the cheapest, but you can read more about pricing [here](https://docs.microsoft.com/en-us/azure/postgresql/quickstart-create-server-database-azure-cli?WT.mc_id=herm-workshop-chnwamba#create-an-azure-database-for-postgresql-server).
 

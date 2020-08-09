@@ -11,7 +11,7 @@ metaTitle: "Authenticated Queries from Next.js App"
 
 ## Exercise 1: Run a Query from Next.js
 
-In the beginning, when we set up the Next.js project, we used the Apollo GraphQL template. This setup installed Apollo and GraphQL libraries and even added a server-rendering logic for GraphQL queries in `lib/apollo.js`. Let’s use Apollo to fetch accounts from our protected GraphQL API.
+Let’s use Apollo GraphQL to fetch accounts from our protected GraphQL API.
 
 **Task 0: Install GraphQL Dependencies**
 
@@ -26,6 +26,7 @@ Install all the GraphQL npm module that we need to use Apollo. Update the `depen
   "apollo-link-http": "1.5.15",
   "graphql": "^14.0.2",
   "graphql-tag": "2.10.1",
+  "next-with-apollo": "^5.1.0"
 }
 ```
 
@@ -37,7 +38,7 @@ npm install
 
 **Task 1: Create an Account Component**
 
-First create an `Account` component in `components/Account`:
+First create an `Account` component in `components/Account.js`:
 
 ```js
 import React from 'react';
@@ -89,7 +90,7 @@ const Account = () => {
 }
 ```
 
-`useQuery` returns an object that contains three different possible states of your query. If no response has yet been received, the `loading` state is true. If a response was received, but an error occurred, the information about that error is stored in `error`. Lastly, if a response was returned and nothing went wrong, the `data` property is populated with the payload or an empty array for empty tables.
+`useQuery` returns an object that contains three different possible states of your query. If no response has yet been received, the `loading` state is true. If a response was received, but an error occurred, the information about that error is stored in `error`. Lastly, if a response was returned and nothing went wrong, the `data` property stores the payload or an empty array for empty tables.
 
 Here is how to handle these 4 possible cases:
 
@@ -160,10 +161,10 @@ To use the component, import it in the `index.js` page file:
 
 ```js
 import React from 'react';
-import fetch from 'node-fetch';
-import { Text } from 'herm';
+import { Text } from '@chakra-ui/core';
 
-+import { withApollo } from '../lib/apollo';
+import Layout from '../components/Layout';
++import withApollo from 'lib/apollo';
 +import Account from '../components/account';
 ```
 
@@ -179,7 +180,9 @@ You can now render the `Account` component in your `Index` component:
 function Index({ me }) {
   return (
     <Layout me={me}>
-      <Text fontSize="32px">Hello, {me.name}</Text>
+      <Text fontSize="40px" color="brand.500" as="h1">
+        Hello, {me.name}!
+      </Text>
 +     <Account />
     </Layout>
   );
@@ -205,16 +208,16 @@ We need to find a way to intercept all API requests and add JWT to the requests'
 Create a `graphql.js` fine in `pages/api`. Just like other API functions we have created, it should have an async handler function:
 
 ```js
-import auth0 from '../../utils/auth0';
+import auth0 from 'lib/auth0';
 
-export default async function graphQL(req, res) {
+export default auth0.requireAuthentication(async function graphQL(req, res) {
   try {
     //...coming up next
   } catch (error) {
     console.error(error);
     res.status(error.status || 500).end(error.message);
   }
-}
+})
 ```   
 
 **Task 2: Get JWT from Incoming Request**
@@ -222,7 +225,7 @@ export default async function graphQL(req, res) {
 Use the `auth0` util to extract the token from the request calling this API:
 
 ```js
-import auth0 from '../../utils/auth0';
+import auth0 from 'lib/auth0';
 
 export default auth0.requireAuthentication(async function graphQL(req, res) {
   try {
@@ -249,10 +252,10 @@ The `getAccessToken` returns an object with the access token which is the user�
 Finally, use the `request` module to send a request to the GraphQL API and attach the token. When a response comes back, forward the response to the Next.js page that asked for it:
 
 ```js
-import request from 'request';
-import util from 'util';
-import auth0 from '../../utils/auth0';
-import config from '../../utils/config';
++import request from 'request';
++import util from 'util';
+ import auth0 from 'lib/auth0';
++import config from 'lib/config';
 
 export default auth0.requireAuthentication(async function graphQL(req, res) {
   try {    
@@ -303,7 +306,7 @@ The most important line where we are setting up the `Authorization` header:
 
 Since Next.js API is promise-based, we need to convert the `request.post` method to a promise, which is what `util.promisify` does. It takes a function with `func(err, cb){}` signature and turns it into a promise.
 
-Finally, we send a request to the GraphQL API and forward the response to Next.js page or whatever initiated a request to this Next.js API. The API endpoint is stored on the config object, so we need to update the config code in `utils/config.js`:
+Finally, we send a request to the GraphQL API and forward the response to Next.js page or whatever initiated a request to this Next.js API. The API endpoint is stored on the config object, so we need to update the config code in `lib/config.js`:
 
 ```js
 require('dotenv').config()

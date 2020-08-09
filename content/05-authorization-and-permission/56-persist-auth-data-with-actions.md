@@ -44,7 +44,7 @@ services:
  volumes:
  - db_data:/var/lib/postgresql/data
  graphql-engine:
-+ image: hasura/graphql-engine:v1.2.0-beta.3
++ image: hasura/graphql-engine:v1.3.0
  ports:
  - "3100:8080"
  depends_on:
@@ -78,7 +78,7 @@ Since our action is supposed to check if a user exists and register them, here i
 type Mutation {
  checkAndRegisterUser : CheckAndRegisterUserOutput
 }
-`"
+```
 
 You should also define the `CheckAndRegisterUserOutput` type in the type definition text box:
 

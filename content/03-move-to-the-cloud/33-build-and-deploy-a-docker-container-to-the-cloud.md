@@ -3,10 +3,13 @@ title: "3.3 Build & Deploy a Docker Container to the Cloud"
 metaTitle: "Build & Deploy a Docker Container to the Cloud"
 ---
 
+> Feel free to skip this page if you are using Hasura cloud
+
 ## Objectives
 
 - Create an App Service Plan
 - Create a container-based web backend
+<!-- - TODO: update for GH actions -->
 - Add environmental variables to connect web app backend to Postgres database
 
 
@@ -41,7 +44,7 @@ A web app resource does not mean a frontend or front-facing app. It means that a
 
 **Task 1: Add a production docker-compose file**
 
-Since our app has been setup as a Docker-based app with a docker-compose file, we need to deploy a Docker container. In the previous chapter, we set up Docker using this file:
+Since our app has been setup as a Docker-based app with a docker-compose file, we need to deploy a Docker container. In the previous chapter, we set up Docker using this content in the `docker-compose.yml` file:
 
 ```yml
 version: '3.6'
@@ -49,28 +52,29 @@ services:
   postgres:
     image: postgres:10
     restart: always
-    environment:
-      POSTGRES_PASSWORD: postgres
+    ports:
+    - "5432:5432"
     volumes:
     - db_data:/var/lib/postgresql/data
+    env_file: 
+      - .env/db.dev.env
   graphql-engine:
-    image: hasura/graphql-engine:v1.2.0-beta.3
+    image: hasura/graphql-engine:v1.3.0
     ports:
     - "3100:8080"
     depends_on:
     - "postgres"
     restart: always
-    environment:
-      HASURA_GRAPHQL_DATABASE_URL: postgres://postgres:postgres@postgres:5432/postgres
-      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
-      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+    env_file:
+      - .env/hasura.dev.env
 volumes:
   db_data:
 ```
+
 We need to change a few things in this file because:
 
 1. Postgres won't scale well in a container, and that is why we created a standalone scalable Azure Postgres database in the previous section.
-2. The port, `3100`, is exposed for localhost. In the cloud, your public port will generally be on `80` or `8080`.
+2. The port, `3100`, is exposed for localhost. In Azure, your public port will generally be on `80` or `8080`.
 
 I don't want to get rid of our current compose file because of the listed reasons, though —  we are still using it locally. What we can do is create another `docker-compose` file for production.
 
@@ -80,13 +84,13 @@ Create a `docker-compose.prod.yml` with the following content:
 version: '3.6'
 services:
   graphql-engine:
-    image: hasura/graphql-engine:v1.2.0-beta.3
+    image: hasura/graphql-engine:v1.3.0
     ports:
     - "8080:8080"
     restart: always
 ```
 
-See how there is no database stuff here, including the connection string. We can't have a production connection string in or any environment variable in this file because we intend to commit it to source control. I will show you how to set those up soon using an `az` command.
+See how there is no database stuff here.
 
 **Task 2: Create a web app**
 
@@ -178,7 +182,7 @@ After a few seconds, reload, and you should get a different error:
 ![](https://paper-attachments.dropbox.com/s_CF587C16DBFCB550886E57AB2E7BCFF7611E95AB7F653D7F40F3C3CC5B40D207_1581923868712_image.png)
 
 
-Remember when we deleted environmental variables from the production compose file, the database url was NOT the only config that we removed. One of those configs tells Hasura to expose the Hasura console to the public. These are the two configs we removed alongside the database config:
+Remember when we moved environmental variables from the docker compose file, the database url was NOT the only config that we moved to an environmental file. One of those configs tells Hasura to expose the Hasura console to the public. These are the two configs we removed alongside the database config:
 
 ```yml
 HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
@@ -229,10 +233,124 @@ az webapp log config \
     --docker-container-logging filesystem
 ```
 
-Setting `--docker-container-logging` to `filesystem` tells Azure to log the app logs to a file. You can the stream this log with the `tail` command:
+Setting `--docker-container-logging` to `filesystem` tells Azure to log the app logs to a file. You can the stream this log file with the `tail` command:
 
 ```bash
 az webapp log tail \
   --resource-group herm \
   --name hermapi
 ```
+
+## Exercise 5: Continuous Deployment with GitHub Action
+
+When Hasura releases a new version, we want to just change the version locally, push, and trigger a deployment automatically.
+
+This goes for any updates we make to our API, not just updating Hasura version.
+
+**Task 1: Add a GitHub Actions Workflow file**
+
+Create the following file in your `api` folder:
+
+```bash
+.github/workflows/main.yml
+```
+
+Add the following content in the file you created:
+
+```yml
+name: Azure Web App Container
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - uses: azure/login@v1.1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Update docker compose file
+      env:
+        HASURA_GRAPHQL_DATABASE_URL: ${{ secrets.HASURA_GRAPHQL_DATABASE_URL }}
+      run: |
+        az webapp config container set \
+          --multicontainer-config-file docker-compose.prod.yml \
+          --multicontainer-config-type compose \
+          --resource-group herm \
+          --name hermapi
+
+    - name: Update database connection string
+      env:
+        HASURA_GRAPHQL_DATABASE_URL: ${{ secrets.HASURA_GRAPHQL_DATABASE_URL }}
+      run: |
+        az webapp config appsettings set \
+          --resource-group herm \
+          --name hermapi \
+          --settings HASURA_GRAPHQL_DATABASE_URL=$HASURA_GRAPHQL_DATABASE_URL
+
+    - name: Update Hasura config
+      run: |
+        az webapp config appsettings set \
+          --resource-group herm \
+          --name hermapi \
+          --settings \
+            HASURA_GRAPHQL_ENABLE_CONSOLE="true" \
+            HASURA_GRAPHQL_ENABLED_LOG_TYPES="startup, http-log, webhook-log, websocket-log, query-log"
+
+```
+
+This workflow file is asking GitHub Actions to:
+
+1. Run this workflow **on** every push or pull request to this repository
+1. Use the latest version of Ubuntu to run this repository
+1. Checkout the repository after Ubuntu has been set up
+1. Log in to Azure
+1. Run the `appsettings set` and `container set` command using Azure CLI on our web app to update the web app.
+
+The action file uses `AZURE_CREDENTIALS` secret to log in to Azure and uses `HASURA_GRAPHQL_DATABASE_URL` to set the database connection string on the web app.
+
+**Task 2: Create Action Secrets**
+
+Create a new repository where you will push this api to.
+
+Click on the Settings tab, then Secrets to add a new Secret. Paste your connection string as show in the image below:
+
+![Create a GitHub Actions Secret](https://res.cloudinary.com/codebeast/image/upload/v1591873640/herm-workshop/CleanShot_2020-06-11_at_13.53.45_2x.png)
+
+**Task 3: Create Azure Credentials for Web App**
+
+You need an Azure credential to be able to give GitHub access to deploy to your Azure web app. To generate the credential, run:
+
+```bash
+az ad sp create-for-rbac \
+  --name "hermapi" \
+  --role contributor \
+  --scopes /subscriptions/<SUBSCRIPTION ID>/resourceGroups/<RESOURCE GROUP>/providers/Microsoft.Web/sites/<NAME> \
+  --sdk-auth
+```
+
+Replace the following:
+
+1. The subscription ID for the web app. It will be default subscription ID we set at the beginning of the workshop. You can list your subscriptions with `az account list -o table`
+2. The resource group we created for the resources. Eg: `herm`
+3. The web app name. Eg: `hermapi`. This is different from the --name flag. The name flag is the name for the credential that Azure will generate NOT the name of the app
+
+Copy the JSON output and create a GitHub Action Secret as show below:
+
+![Create a GitHub Actions Secret](https://res.cloudinary.com/codebeast/image/upload/v1591874052/herm-workshop/CleanShot_2020-06-11_at_15.12.41_2x.png)
+
+**Task 4: Push Code to GitHub**
+
+Finally, push the api project to GitHub. GitHub will immediately run anything in the `.github/workflows` folder as Actions.
+
+You can view your Actions by going to the Actions tab of your repository:
+
+![GitHub Actions](https://res.cloudinary.com/codebeast/image/upload/v1591874262/herm-workshop/CleanShot_2020-06-11_at_15.16.45_2x.png)

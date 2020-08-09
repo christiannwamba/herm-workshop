@@ -3,7 +3,7 @@ title: "4.1 Set up an Authentication Server"
 metaTitle: "Set up an Authentication Server"
 ---
 
-Auth0 is an Authentication as a Service platform. It gives you an Auth server + SDKs that handles everything Authentication while you focus on just implementation. You can start using Auth0 for free; therefore, we won’t pay for anything to use it for Herm.
+Auth0 is an Authentication as a Service platform. It gives you an Auth server + SDKs that handles everything Authentication while you focus on just implementation. You can start using Auth0 for free -- so, we won’t pay for anything to use it for Herm.
 
 
 ## Objectives
@@ -69,6 +69,8 @@ You should also add your production urls by comma-separating them:
 
 - **Allowed Callback URLs**: [http://localhost:3000/api/callback](http://localhost:3000/api/callback), https://hermapp.azurewebsites.net/api/callback
 - **Allowed Logout URLs**: [http://localhost:3000/](http://localhost:3000/), https://hermapp.azurewebsites.net/
+
+Replace my production base url `hermapp.azurewebsites.net` with yours.
 
 Scroll to the bottom of the page and click **SAVE CHANGES**.
 
