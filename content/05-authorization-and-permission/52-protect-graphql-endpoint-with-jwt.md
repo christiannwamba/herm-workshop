@@ -90,6 +90,7 @@ function(user, context, callback) {
   context.accessToken[namespace] = {};
   context.accessToken\[namespace\]['x-hasura-default-role'] = 'user';
   context.accessToken\[namespace\]['X-Hasura-User-Id'] = user.screen_name;
+  context.accessToken[namespace]['x-hasura-allowed-roles'] = [ 'user' ];
   callback(null, user, context);
 }
 ```
