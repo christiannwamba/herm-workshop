@@ -6,7 +6,7 @@ metaDescription: "Add authentication to your frontend app."
 
 If this is not your first implementing an auth feature, then my wild guess is that you have written that feature yourself (probably from scratch). If you have never written auth in the past, you are lucky to be in a modern era. 
 
-In this chapter, we are not going to re-invent the will like we always did. Remember the “buy not build” principle? Most of what we are going to be doing in this chapter with authentication is going to be supported by a third-party service — don’t worry we will not pay to use it.
+In this chapter, we are not going to re-invent the wheel like we always did. Remember the “buy not build” principle? Most of what we are going to be doing in this chapter with authentication is going to be supported by a third-party service — don’t worry we will not pay to use it.
 
 Before we dive in, here is what the flow for auth will look like when we are done:
 
