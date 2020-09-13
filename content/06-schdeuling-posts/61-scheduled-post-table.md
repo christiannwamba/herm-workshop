@@ -27,6 +27,10 @@ Set `scheduled_post` as the table name and then define the table columns as show
 
 The `schedule_for` column takes a timestamp, the exact time when the post should be sent out. The other column, `is_pending` will act as a flag that will be switched when the post has been tweeted.
 
+Click on the **Frequently used columns** and select **created_at**
+
+> Screenhshot showing frequently selected columns
+
 **Task 2: Add a primary key**
 
 Right below the column names, you will find a field for setting the table’s primary key. The primary key is a unique identifier for each row in your table.
@@ -47,7 +51,7 @@ Scroll down to the bottom of the page and click on the **Add Table** button.
 
 ## Exercise 2: Set user permissions
 
-To allow a user access to the new table created, we need to grant the user role permission to the table. To add this permission, go to the **Data** page, choose _scheduled_post_ table and click the **Permissions** tab.
+To allow user access to the new table created, we need to grant the user role permission to the table. To add this permission, go to the **Data** page, choose the **scheduled_post** table and click the **Permissions** tab.
 
 **Task 1: Allow row insert**
 On the permissions tab, select the **insert** cell for the user role. Under **Row insert permissions** select **With custom check**. We'll add a custom check similar to that we set up on the other tables, the custom check will allow users access **scheduled_posts** created by them.
