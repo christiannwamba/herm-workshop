@@ -19,35 +19,39 @@ We want a many-to-many relationship between an accounts' table and a users' tabl
 
 Click on the Data tab then click on the Add Table button:
 
-> Add tables screenshot
+![Add new table](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600038093846_herm-ad-tabe.png)
 
 Set `scheduled_post` as the table name and then define the table columns as shown below:
 
-> Add screenshot show columns
+![Scheduled Post columns](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600037770053_herm-show-columns.pnghttps://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600037770053_herm-show-columns.png)
 
 The `schedule_for` column takes a timestamp, the exact time when the post should be sent out. The other column, `is_pending` will act as a flag that will be switched when the post has been tweeted.
 
 Click on the **Frequently used columns** and select **created_at**
 
-> Screenhshot showing frequently selected columns
+![Add created_at column](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600037391531_Screenshot+2020-09-13+at+11.46.39+PM.png)
 
 **Task 2: Add a primary key**
 
 Right below the column names, you will find a field for setting the table’s primary key. The primary key is a unique identifier for each row in your table.
 
-> Screenshot showing primary key
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600038573700_herm-primary-key.png)
+
+Select the `id` as your primary key:
+
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600038411103_Screenshot+2020-09-14+at+12.05.46+AM.png)
 
 **Task 3: Add a foreign key**
 
 Add a foreign key to define a many-to-one relationship with the user table. The `user_id` column of the table will be linked to the `id` column of the user table.
 
-> Screenshot showing foreign key
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600038805478_Screenshot+2020-09-14+at+12.11.27+AM.png)
 
 **Task 4: Save table**
 
 Scroll down to the bottom of the page and click on the **Add Table** button.
 
-> Screenshot showing how to add table
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600038986050_herm-save-table.png)
 
 ## Exercise 2: Set user permissions
 
@@ -64,7 +68,7 @@ When done, click the **Save permissions**
 
 Next, click on the **select** cell and enter the same permissions. You should see an option labeled **With same custom check as insert**, select that option. Click **Toggle All** in the **Column Select Permissions** section.
 
-> Insert screenshot showing select permissions
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600039116704_Screenshot+2020-09-08+at+7.58.14+PM.png)
 
 Click **Save permissions** to save.
 
@@ -73,6 +77,6 @@ Click **Save permissions** to save.
 
 Click the **update** cell and select the **With same custom check as insert, select** option below the **Pre-update check** and the **Post-update check**. Then, click **Toggle All** under the **Column update permissions** section.
 
-> Insert screenshot showing update permissions
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600039079004_Screenshot+2020-09-08+at+8.02.48+PM.png)
 
 Click **Save permissions** to save the update
