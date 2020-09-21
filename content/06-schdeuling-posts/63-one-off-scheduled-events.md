@@ -112,7 +112,7 @@ async function checkAndRegisterUser(client) {
 
 We can now attempt creating a post, head to the browser, enter text in the form field and select the date and time. Submit the form when done.
 
-> Add video showing post creation
+<iframe src="https://player.vimeo.com/video/459984743" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
 
 Posts can now be created but that's not where it ends, we also want the post to be tweeted at the time provided. To do this, we'll create a one-off Hasura event.
 
@@ -130,11 +130,11 @@ We need the One-off scheduled event for this particular task, scheduled events c
 
 To create using the console, click on _Events_ on the navigation bar:
 
-> Annotated Screenshot highlighting the events link and showing the events page
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600680940651_herm-events.png)
 
 On the _events_ page, click on _One-off scheduled events_ on the sidebar and then the `Schedule an event` tab:
 
-> Annotated Screenshot highlighting the One-off scheduled events link, the schedule an event tab and showing the One-off scheduled events page
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600680940662_herm-schedule.png)
 
 To create this event, you'll need a timestamp, webhook, an accompanying payload and optional headers.
 
@@ -173,7 +173,7 @@ A successful request should return the following response:
 
 Head over to the Hasura console, click **Events** > **One-off Scheduled Events** and **Pending Events**. You should see a new event:
 
-> Pending event screenshot
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600680417364_Screenshot+2020-09-21+at+12.12.18+AM.png)
 
 **Task 1: Create scheduled event**
 
@@ -240,4 +240,4 @@ Scheduled events can be created by admins only, to create one you'll need the se
 
 Head back to the application in the browser and create a new scheduled post, doing this should create a new pending event in the Hasura console.
 
-> Screenshot showing pending event
+<iframe src="https://player.vimeo.com/video/460101556" width="640" height="360" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
