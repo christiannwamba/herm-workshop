@@ -53,14 +53,29 @@ Scroll down to the bottom of the page and click on the **Add Table** button.
 
 ![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600038986050_herm-save-table.png)
 
-## Exercise 2: Set user permissions
+
+## Exercise 2: Add relationships
+
+To allow nested queries of `scheduled_posts` on the user object, we'll a relationship on both the `user` and `scheduled_post` tables.
+
+On the Hasura console, navigate to **Data** > **user** and then click on the **Relationships** tab. You should see **Suggested relationships**
+
+![Click on the **Add** button to create a relationship](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600640444706_herm-add-rela.png)
+
+Do the same for the `scheduled_post` table:
+
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600640444697_herm-add-rela-2.png)
+
+
+## Exercise 3: Set user permissions
 
 To allow user access to the new table created, we need to grant the user role permission to the table. To add this permission, go to the **Data** page, choose the **scheduled_post** table and click the **Permissions** tab.
 
 **Task 1: Allow row insert**
+
 On the permissions tab, select the **insert** cell for the user role. Under **Row insert permissions** select **With custom check**. We'll add a custom check similar to that we set up on the other tables, the custom check will allow users access **scheduled_posts** created by them.
 
-> Insert the screenshot for custom checks.
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600637438791_Screenshot+2020-09-20+at+10.28.48+PM.png)
 
 When done, click the **Save permissions**
 
@@ -71,7 +86,6 @@ Next, click on the **select** cell and enter the same permissions. You should se
 ![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600039116704_Screenshot+2020-09-08+at+7.58.14+PM.png)
 
 Click **Save permissions** to save.
-
 
 **Task 3: Allow row update**
 
