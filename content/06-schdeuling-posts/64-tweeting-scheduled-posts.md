@@ -55,7 +55,7 @@ func start
 
 You should see the the new route registered
 
-> Insert command screenshot
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600681814453_Screenshot+2020-09-13+at+7.32.17+PM.png)
 
 ## Exercise 2: Write a Serverless Handler
 
@@ -274,5 +274,5 @@ hasura open --envfile .env/hasura.dev.env
 
 Head to the **Events** > **One-off scheduled posts** > **Processed Events** page and you should see all processed events here:
 
-> Screenshot showing processed events
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600682025028_Screenshot+2020-09-21+at+10.53.05+AM.png)
 
