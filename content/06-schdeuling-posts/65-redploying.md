@@ -1,6 +1,6 @@
 ---
-title: "6.4 Handle Events with Serverless Functions"
-metaTitle: "Tweet posts scheduled using Twitter's API"
+title: "6.5 Publishing changes"
+metaTitle: "Re-deploy application and publish local changes to production"
 ---
 
 We have made a number of changes locally, we need update the production environment to be in sync with the local environment. This includes the API, frontend app and the new serverless function we created to handle the event
@@ -52,9 +52,6 @@ hasura console \
 
 You can see that we now have a database structure which in turn generates this GraphQL schema:
 
-> Screenshot showing production environment with new migrations
-
-
 ## Exercise 2: Deploy new function
 
 Next let's update our functions deployment with the new function.
@@ -83,7 +80,7 @@ func azure functionapp publish <UNIQUE NAME Eg. hermserverless>
 
 Upon successful deployment, you should see the following in your terminal
 
-> Publishing screenshot
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600681814461_Screenshot+2020-09-13+at+11.15.44+PM.png)
 
 The new function should be visible with your URL.
 
