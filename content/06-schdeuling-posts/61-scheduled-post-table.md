@@ -23,7 +23,7 @@ Click on the Data tab then click on the Add Table button:
 
 Set `scheduled_post` as the table name and then define the table columns as shown below:
 
-![Scheduled Post columns](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600037770053_herm-show-columns.pnghttps://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600037770053_herm-show-columns.png)
+![Scheduled Post columns](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600037770053_herm-show-columns.png)
 
 The `schedule_for` column takes a timestamp, the exact time when the post should be sent out. The other column, `is_pending` will act as a flag that will be switched when the post has been tweeted.
 
