@@ -228,11 +228,11 @@ const PostCard = ({ me, post }) => {
 export default PostCard;
 ```
 
-No posts have been created yet, head over to the Hasura explorer and paste the following query to create a new post.
+There are no posts to display in the app yet, to create a new post, head over to the Hasura explorer and paste the following query to create a new post.
 
 ```js
 mutation {
-  insert_scheduled_post(objects: {text: "Creating a new post", schedule_for: "0220-09-10T14:39:27.046Z", user_id: 1}) {
+  insert_scheduled_post(objects: {text: "Creating a new post", schedule_for: "2020-09-10T14:39:27.046Z", user_id: 1}) {
     affected_rows
   }
 }
@@ -252,7 +252,7 @@ If the post creation was successful, you should get the following response:
 
 Head to your browser, you should have an updated view, it should look like this:
 
-> New view screenshot
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600640840294_Screenshot+2020-09-20+at+11.26.06+PM.png)
 
 It's not ideal to be heading to explorer whenever there's a need to create a post, so let's add a form that will let users create new posts.
 
@@ -525,6 +525,6 @@ function Index({ me }) {
 
 Head to the browser to see the changes. You should see a view similar to this:
 
-> Screenshot with schedule form
+![](https://paper-attachments.dropbox.com/s_A1A0E77332EB516A55B20A9874A0C7735C43BC1EFCB6880379E198D45BF72020_1600640840285_Screenshot+2020-09-20+at+11.25.04+PM.png)
 
 Submitting the form fails and in the next section, we will create a new route for creating posts and then create a 'One-Off Event' in Hasura to execute on the given date
