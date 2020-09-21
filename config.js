@@ -27,7 +27,10 @@ const config = {
 			"/00-before-you-start",
     	"/01-setup-ui",
 			"/02-graphql-api",
-			"/03-move-to-the-cloud"
+      "/03-move-to-the-cloud",
+      "/04-authentication",
+      "/05-authorization-and-permission",
+      "/06-scheduling-posts"
 		],
 		"links": [
 			{ "text": "Herm", "link": "https://herm.dev"},
