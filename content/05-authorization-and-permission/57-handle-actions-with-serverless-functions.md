@@ -23,7 +23,7 @@ npm i -g azure-functions-core-tools@2 --unsafe-perm true
 Next head into the `api` folder where your `docker-compose` files live and run the init command to create a function project:
 
 ```bash
-func init serverless
+func init .
 ```
 
 Chose `node` as the runtime and `javascript` as the language:
@@ -31,34 +31,44 @@ Chose `node` as the runtime and `javascript` as the language:
 ![](https://paper-attachments.dropbox.com/s_D1E455E16E08DAA74D4D60DB2DF4FC15958E4AEC653FCADD3E6BCA57015B69CB_1585236212970_image.png)
 
 
-This will create a serverless folder that holds the project files for your serverless API. Create a new serverless function:
+This will create the serverless project files for your serverless API which includes a `host.json`, a `local.settings.json`, and a `package.json`. 
+
+Create a new serverless function:
 
 ```bash
-# Move into the serverless folder
-cd serverless
-
 # Create a function
 func new
 ```
 
-Choose `HTTP trigger` for template. When asked for the function name, use `checkAndRegisterUser`.
+Choose `HTTP trigger` for template. When asked for the function name, use `action_checkAndRegisterUser`.
 
 ![](https://paper-attachments.dropbox.com/s_D1E455E16E08DAA74D4D60DB2DF4FC15958E4AEC653FCADD3E6BCA57015B69CB_1585236402335_image.png)
 
 
-The serverless folder should have the following content now:
+`action_checkAndRegisterUser/index.js` is where you will write your handler logic. 
 
-```bash
-.
-├── checkAndRegisterUser
-│   ├── function.json
-│   └── index.js
-├── host.json
-├── local.settings.json
-└── package.json
+We only appended `action_` to the function name to make it easier to tell that the serverless function is tied to a Hasura action. If you run the function, you endpoint path will be `/api/action_checkAndRegisterUser` instead of `/api/checkAndRegisterUser`.
+
+Open `action_checkAndRegisterUser/function.json` and add a `route` property that points to `checkAndRegisterUser`:
+
+```json
+{
+  "bindings": [
+    {
+      "authLevel": "function",
+      "type": "httpTrigger",
+      "direction": "in",
++     "route": "checkAndRegisterUser",
+      ...
+    },
+   ...
+  ]
+}
 ```
 
-`checkAndRegisterUser/index.js` is where you will write your handler logic. You can test the function by running:
+Now your endpoint path will be `/api/checkAndRegisterUser`.
+
+You can test the function by running:
 
 ```bash
 func start
@@ -101,7 +111,7 @@ A serverless function is a function export that takes `context` and `req` for re
 
 **Task 1: Get the Session Variables**
 
-First things first, we are handling errors so that we can then put the rest of our logic inside the `try` block.
+Put the rest of our logic inside the `try` block.
 
 ```js
 try {
@@ -164,7 +174,7 @@ try {
   const accessTokenSecret = session_variables['x-hasura-access-token-secret'];
   let affected_rows = 0;
 
-  const client = createClient(req);
++ const client = createClient(req);
 
 }
 ```
@@ -275,12 +285,13 @@ The endpoint for our GraphQL API should be stored in an env variable, and that�
 
 ## Exercise 3: Run Action from Next.js App
 
-Between Auth0 and heading back to our home page, we need to call the action we created. It is the perfect time to check if the user that just logged in already exists in our database. If not, we will create the user.
+Between Auth0 callback and heading back to our home page, we need to call the action we created. It is the perfect time to check if the user that just logged in already exists in our database. If not, we will create the user.
 
 After Auth calls our callback page, instead of redirecting to the home page, we should redirect to a signup page that will call the action. Create a `pages/api/signup.js` file:
 
 ```js
-export default async function signup(req, res) {
+import auth0 from 'lib/auth0';
+export default auth0.requireAuthentication(async function signup(req, res) {
   try {
 
     res.writeHead(302, { Location: '/' });
@@ -289,58 +300,59 @@ export default async function signup(req, res) {
     console.error(error);
     res.status(error.status || 400).end(error.message);
   }
-}
+})
 ```    
 
-All it does for now is to redirect us to the home page. We want it to do more so let’s import Apollo libraries and create a client:
+All it does for now is to redirect us to the home page. We want it to do more so let’s create a client that we can use to send GraphQL request to the server:
 
 ```js
-import { ApolloClient } from 'apollo-client';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import fetch from 'node-fetch';
-import { createHttpLink } from 'apollo-link-http';
-import gql from 'graphql-tag';
+export default auth0.requireAuthentication(async function signup(req, res) {...});
 
-export default async function signup(req, res) {...}
-
-async function createClient(req) {
-  const cache = new InMemoryCache();
-  const link = createHttpLink({
-    uri: `${process.env.BASE_URL}/api/graphql`,
-    fetch: fetch,
-    credentials: 'same-origin',
-    headers: req.headers
-  });
-
-  const client = new ApolloClient({
-    cache,
-    link
-  });
-
+function createClient(req, res) {
+  async function client(query, variables) {
+    const tokenCache = await auth0.tokenCache(req, res);
+    const { accessToken } = await tokenCache.getAccessToken({
+      scope: ['openid', 'profile'],
+    });
+    try {
+      const result = await fetch(`${process.env.APP_BASE_API}/v1/graphql`, {
+        method: 'POST',
+        body: JSON.stringify({
+          query: query,
+          variables,
+        }),
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      const data = await result.json();
+      return data;
+    } catch (error) {
+      throw error;
+    }
+  }
   return client;
 }
 ```    
 
-The `createClient` function creates an Apollo client instance and returns that instance. We can then use the instance to query or mutate our API.
+The `createClient` function creates gets the access token from Auth and tries to make a request to a GraphQL endpoint based on argument we pass to it.
 
 Create another function that calls the GraphQL API using the client :
 
 ```js
-export default async function signup(req, res) {...}
-
 async function createClient(req) {...}
 
 async function checkAndRegisterUser(client) {
-  const result = await client.mutate({
-    mutation: gql`
+  const CHECK_USER_QUERY = `
       mutation CheckAndRegisterUser {
         checkAndRegisterUser {
           affected_rows
         }
       }
-    `
-  });
+    `;
 
+  const result = await client(CHECK_USER_QUERY, {});
   return result;
 }
 ```    
@@ -348,9 +360,9 @@ async function checkAndRegisterUser(client) {
 Now we can call the `checkAndRegisterUser` function inside the try…catch block of the exported Next.js API signup function while passing it the client:
 
 ```js
-export default async function signup(req, res) {
+export default auth0.requireAuthentication(async function signup(req, res) {
   try {
-    const client = await createClient(req);
+    const client = createClient(req, res);
 
     await checkAndRegisterUser(client);
 
@@ -359,6 +371,21 @@ export default async function signup(req, res) {
   } catch (error) {
     console.error(error);
     res.status(error.status || 400).end(error.message);
+  }
+});
+```
+
+Lastly, update the callback endpoint to redirect to the signup API instead of redirecting to the home page:
+
+```javascript
+import auth0 from 'lib/auth0';
+
+export default async function callback(req, res) {
+  try {
++   await auth0.handleCallback(req, res, { redirectTo: '/api/signup' });
+  } catch (error) {
+    console.error(error);
+    res.status(error.status || 400).json({ error: "Something went wrong" });
   }
 }
 ```

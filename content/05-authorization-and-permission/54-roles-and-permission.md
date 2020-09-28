@@ -36,7 +36,7 @@ Users who are not registered but has the `x-hasura-allowed-roles` set to `user`:
 
 Before we get into permissions, let’s update our database based on what our current requirement development looks like.
 
-When we created the account table, it only had an account name and access token fields. Now that we know that we also need to store the access token secret, we should add more columns for that.
+When we created the account table, it only had an account name and access token fields. Now that we know that we also need to store the access token secret, we should add a column for that.
 
 Go to the **Data** page and choose **account** table. Next click on the **Modify** tab and add a column `access_token_secret`:
 
@@ -87,7 +87,7 @@ Make sure that `x-hasura-admin-secret` is NOT selected and try running this muta
 
 It is ok for random people to join our app — that’s what we want at the end of the day. So go to the **Data** page, chose **account** table, and click on the **Permissions** tab.
 
-Edit the insert permission and select **Without any checks** for rows. Enable the fields shown under the columns as seen below to make them writable by a user:
+Add a new `user` role and click on the insert row to edit. Edit the insert permission and select **Without any checks** for rows. Enable the fields shown under the columns as seen below to make them writable by a user:
 
 
 ![](https://paper-attachments.dropbox.com/s_AF7E313CD6CEF2268008A72A380E4FE0813E9AE8FD4F9099354C129E6AAFA8DD_1585142300260_image.png)
@@ -170,3 +170,16 @@ Click delete permission cell for a user and select **With same custom check as i
 
 ![](https://paper-attachments.dropbox.com/s_AF7E313CD6CEF2268008A72A380E4FE0813E9AE8FD4F9099354C129E6AAFA8DD_1585205418404_image.png)
 
+**Task 3: Users Can View their Profile**
+
+You also want to have the flexibility of fetching a user's profile when needed. To eanble this, open the `user` table and click on the Permissions tab.
+
+Select the `select` field and set it up the rows anc columns like this:
+
+![](../media/authorization/roles-permission/user-profile-permission.png)
+
+Do the same for the account table but set it up as shown in the image below:
+
+(Note that to check for the username, we have to first find the user that is related to the account. I also selected only the `account_name` column so users cannot query their token and secret)
+
+![](../media/authorization/roles-permission/account-permission.png)

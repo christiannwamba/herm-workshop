@@ -8,7 +8,7 @@ We are coming close to the end of this chapter. I hope it was a great learning e
 
 ## Objectives
 - Deploy Next.js app to the cloud
-- Setup continuous delivery
+- Setup continuous deployment for Next.js app
 
 
 ## Exercise 1: Deploy Next.js to Azure
@@ -58,105 +58,100 @@ az webapp browse \
 ![](https://paper-attachments.dropbox.com/s_BC403D2BFE0C3B066DBCCFD377C1B34BBCE7654080CD72F324A50E5BF331E423_1582546529369_image.png)
 
 
-We need to push our own code instead.
+We need to push our own code though.
 
-**Task 4: Generate Github Access Token**
+**Task 4: Setup Continuous Delivery with GitHub Actions**
 
 We can pull code from Github into our Web App service, but what would be cool is to set up continuous delivery so that every push event on the Github repo would update the site.
 
-To give Azure Web App the privileges to fetch code from our Github account, we need to get an access token from Github.
+To do this, we need to create another GitHub Action for the web app. Start by creating the relevant folders and files in your Next.js web app:
 
-1. Click on → https://github.com/settings/tokens/new
-2. Give the token a **name** and **access to your repositories** before generating:
+```bash
+cd app
+mkdir .github
+mkdir .github/workflows
+touch .github/workflows/main.yml
+```
 
-![](https://paper-attachments.dropbox.com/s_BC403D2BFE0C3B066DBCCFD377C1B34BBCE7654080CD72F324A50E5BF331E423_1582546864523_image.png)
+Next paste the following workflow configuration in the `main.yml` file:
 
-> Copy the token and store it somewhere safe. This is the only time Github will show you this token.
+```yml
+name: Deploy Herm App to Azure
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: 'Checkout GitHub Action'
+      uses: actions/checkout@master
+
+    - name: 'Login to Azure'
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Setup Node 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: '12.x'
+
+    - name: 'npm install, build, and test'
+      run: |
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+
+    - name: 'Deploy to Azure'
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'hermapp'
+
+    - name: Logout
+      run: |
+        az logout
+```
+
+This action is quite similar to the one we had in our API. Here are the steps in the workflow:
+
+1. Checkout the GitHub repository
+1. Log in to Azure. Follow the steps in [API Continuous Deployment](/03-move-to-the-cloud/33-build-and-deploy-a-docker-container-to-the-cloud#exercise-5-continuous-deployment-with-gitHub-action) to create a secret for `AZURE_CREDENTIALS`
+1. Setup Node
+1. Install Node and Build the web app
+1. Deploy the app to an Azure Web App Service called `hermapp`
+
+The final step will start the app automatically for you on Azure using `npm start`. Let's setup the start script to ensure that it runs correct command.
 
 **Task 5: Update Scripts**
 
-Remove the `build` script and update the `start` script to build and start the app:
+Update the `start` script:
 
 ```json
 "scripts": {
  "dev": "next",
-- "build": "next build"
-+ "start": "next build && next start -p $PORT",
+  "build": "next build"
+- "start": "next start",
++ "start": "node node_modules/next/dist/bin/next start -p $PORT",
  "export": "next export",
  "deploy": "npm run build && npm run export"
 },
 ```
 
-**Task 6: Push Code to Github and Setup Continuous Delivery**
+Nex.jst originally uses `next start` to start your app which is a link to what is in `node_modules/next/dist/bin/next`. There is a known issue that when you use GitHub Actions to build your app and zip it for deploy, the link between `./node_modules/.bin/<module_name>` and `node_modules/<module_name>/dist/bin/<module_name>` gets broken. So instead of relying on the link, you can just point directly to the script `node_modules/next/dist/bin/next`.
 
+The `-p` flag is used to override the default port that Next starts on. In this case, we want Next to use the port that Azure sets up in the environmental variable.
 
-1. First, push your code to Github
-2. Then use the Github repo (private or public) link and the access token to set up continuous deployment/delivery:
+**Task 6: Push Code to Github**
 
-```bash
-az webapp deployment source config \
- --branch master \
- --name hermapp \
- --repo-url <REPO URL eg: https://github.com/christiannwamba/herm-app> \
- --resource-group herm \
- --git-token <GITHUB ACCESS TOKEN>
-```
-
-Wait for 3-5 minutes for the build process to complete and run the following command to show your running app:
+Head to your terminal, commit and push to GitHub:
 
 ```bash
-az webapp browse \
- --name <APP NAME> \
- --resource-group herm
+git add .
+git commit -m "<Commit message>"
+git push -u origin master
 ```
-
-![](https://paper-attachments.dropbox.com/s_BC403D2BFE0C3B066DBCCFD377C1B34BBCE7654080CD72F324A50E5BF331E423_1582547409727_image.png)
-
-## Exercise 2: Staging Deployment Slot
-
-It is never a good practice anywhere to push directly to master or production. Azure Deployment Slots lets you set up different slots for things like testing, reviews, etc. Let's create one for staging where you can test things out before pushing it to production.
-
-**Task 1: Create a Slot**
-
-Azure creates a default slot called **production**. You can see it by opening the app from the Azure portal and clicking the Deployment slots:
-
-![](https://paper-attachments.dropbox.com/s_BC403D2BFE0C3B066DBCCFD377C1B34BBCE7654080CD72F324A50E5BF331E423_1582547887054_image.png)
-
-
-To add one more (e.g. staging), run the following:
-
-```bash
-az webapp deployment slot create \
- --name <YOUR APP NAME> \
- --resource-group herm \
- --slot staging
-```
-
-**Task 2: Create a Staging Branch**
-
-Create a staging branch on your Next.js app that you can push to the staging slot:
-
-```bash
-git checkout -b staging
-```
-
-You can make visual changes to this branch if you like, then push it to Github:
-
-```bash
-git push origin staging
-```
-
-**Task 3: Deploy Staging Branch to Staging Slot**
-
-Finally, deploy the branch you just created to the staging slot:
-
-```bash
-az webapp deployment source config \
- --branch staging \
- --name <APP NAME> \
- --repo-url <REPO URL eg: https://github.com/christiannwamba/herm-app> \
- --resource-group herm \
- --git-token <GITHUB_ACCESS_TOKEN> \
- --slot staging
-```
-

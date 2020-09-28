@@ -13,14 +13,13 @@ What Next.js has done really well, is to give us a platform to build React apps 
 
 
 - Create a Next.js app
-- Learn how to create Next.js apps using existing templates (e.g., Apollo GraphQL template)
 
 
 ## Exercise 1: Create a Next.js App
 
-**Task 1: Download an Apollo-based Next.js App**
+**Task 1: Create App**
 
-You can either [manually](https://github.com/zeit/next.js/#manual-setup) create a Next.js app or use the `create-next-app` CLI tool. Create a project folder where you want everything regarding herm to live. 
+You can either [manually](https://github.com/zeit/next.js/#manual-setup) create a Next.js app or use the `create-next-app` CLI tool. Create a project folder where you want everything regarding herm to live.
 
 ```bash
 mkdir herm
@@ -33,16 +32,8 @@ In the new folder you just created, create Next.js app:
 npm install -g create-next-app
 
 # Create a new app
-create-next-app --example with-apollo
+create-next-app app
 ```
-
-Note that I have passed the `--example` argument with a value of `with-apollo`. What this means is that `create-next-app` is going to create a new app based on the Apollo Graphql [template](https://github.com/zeit/next.js/tree/canary/examples/with-apollo).
-
-Using a template saves us the time of setting up Apollo manually. If we did set up manually, we would also have to configure Next.js manually to render Apollo query responses to the server.
-
-Once the setup starts, the CLI tool will ask you to name your project — I called mine app. The setup will also install the npm dependencies, so we don’t have to do that.
-
-![CLI Installation](https://paper-attachments.dropbox.com/s_B020FEEBF4767840022187CA0BA6A0F6CA541E25134EC513599691F5CCDF563A_1578845462086_image.png)
 
 
 **Task 2: Run the Next.js app**
@@ -60,31 +51,31 @@ npm run dev
 You should get a good-looking Hacker News clone:
 
 
-![First, run with Hacker News UI](https://paper-attachments.dropbox.com/s_B020FEEBF4767840022187CA0BA6A0F6CA541E25134EC513599691F5CCDF563A_1578846258933_image.png)
+![First, run with Next.js starter screen](https://res.cloudinary.com/codebeast/image/upload/v1591516611/CleanShot_2020-06-07_at_11.56.35_2x.png)
 
 
 ## Exercise 2: Reset
 
-If only we were building a Hacker News app, we could have just changed the blue to herm’s pink brand color and called it a day. We have to wipe everything except Next.js and Apollo related stuff.
+To get a clean slate, you need to remove the starter code with the following command.
 
 ```bash
-# Delete components and pages folder
-rm -rf components pages
+# Delete the pages folder
+rm -rf pages
 ```
 
-Now if you take a look at the app in the browser again, we should be getting a nice 404:
+If you take another look at the app in the browser, you should be getting a nice 404:
 
 
 ![404 after reset](https://paper-attachments.dropbox.com/s_B020FEEBF4767840022187CA0BA6A0F6CA541E25134EC513599691F5CCDF563A_1578846877978_image.png)
 
 
-At this point, you are wondering why removing those two folders resulted in a 404 page. Well, the way Next.js works is that every file in the `pages` folder must be a component, and each of these components will serve as web pages.
+At this point, you are wondering why removing those two folders resulted in a 404 page. Well, the way Next.js works is that every file in the `pages` folder must return a React component, and each of these components will serve as web pages.
 
 If Next.js doesn’t find the appropriate file in the pages folder, in this case, `pages/index.js` for `/` route, it will throw a 404. This is nice because you get basic routing stuff for free.
 
 It’s also good to note that, by convention, any other component that does not map to a route should be kept in the `components` folder.
 
-Now re-create those folders, but this time with the bare minimum content:
+Now create an empty `components` and `pages`:
 
 ```bash
 # Recreate
@@ -94,10 +85,10 @@ mkdir components pages
 touch pages/index.js
 ```
 
-If you retake a look at the app, you should see a more detailed error. The error is telling you that although it sees a page file, that file doesn’t export a valid React component.
+If you take another look at the app, you should see a more detailed error. The error is telling you that although it sees a page file, that file doesn’t export a valid React component.
 
 
-![Error after pages/index.js is added](https://paper-attachments.dropbox.com/s_B020FEEBF4767840022187CA0BA6A0F6CA541E25134EC513599691F5CCDF563A_1578847389080_image.png)
+![Error after pages/index.js is added](https://res.cloudinary.com/codebeast/image/upload/v1591516927/CleanShot_2020-06-07_at_12.01.57_2x.png)
 
 
 Add the following to the `pages/index.js`:

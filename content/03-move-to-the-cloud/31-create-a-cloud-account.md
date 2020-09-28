@@ -3,7 +3,7 @@ title: "3.1 Create a Cloud Account"
 metaTitle: "Create a Cloud Account"
 ---
 
-We are going to use Azure as our cloud provider since it comes with a $200 credit and a lot of free tier for some of the cloud services we need to deploy our app.
+We are going to use Azure as our cloud provider since it comes with a $200 credit and a lot of free tier for some of the cloud resources we need to deploy our app.
 
 
 ## Objectives

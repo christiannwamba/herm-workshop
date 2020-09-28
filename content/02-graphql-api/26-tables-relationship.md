@@ -1,5 +1,5 @@
 ---
-title: "2.4 Tables Relationship"
+title: "2.6 Tables Relationship"
 metaTitle: "Tables Relationship"
 ---
 
@@ -16,7 +16,7 @@ As a reminder, here is what our database model looks like from the previous sect
 - Create a many-to-many relationship using a **bridge table**
 - Create one-to-many relationships
 
-A bridge table is like every other table you have created with just one difference — it has a foreign key of 2 or more tables. Tables connected by a bridge table are said to have a many-to-many relationship with each other.
+A bridge table is like every other table you have created with just one difference — it has the foreign keys of 2 or more tables. Tables connected by a bridge table are said to have a many-to-many relationship with each other.
 
 Using our model as an example, `account_id` of value `1` can appear multiple times in Account User bridge table. For each time it appears in the table, the `user_id` value could be different. This means that each of those users belongs to one account. What makes this many-to-many, though, is that it goes both ways. One user can belong to as many accounts as the user wants
 
@@ -59,7 +59,7 @@ The form fields expect you to choose which table and columns you want to link to
 
 ![](https://paper-attachments.dropbox.com/s_818084DF86985F214D07736EAC56BFA386DB84F5EDD56671434B6943EBCA1FA8_1581016666437_Screen+Shot+2020-02-06+at+11.16.37+AM.png)
 
-1. The reference table we want to connect is the `account` table
+1. The **Reference Table** is the table we want to connect is the `account` table
 2. The **From** field value should be the field on `account_user` that you want to relate to the `account` table
 3. The **To** field value should be the field on account (which is the primary key)
 
@@ -71,3 +71,5 @@ Click the **Save** button and repeat this process for the `user` table:
 - The relationship between `account` and `account_user` is a **one-to-many** relationship
 - The relationship between `user` and `account_user` is a **one-to-many** relationship
 - The relationship between `account` and `user` is a **many-to-many** relationship
+
+Finally, click **Add Table** to create the table.

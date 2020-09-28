@@ -16,7 +16,7 @@ Let’s use the Auth client and API we created to authenticate a user from our N
 
 You can use the client and API details of the Auth0 client and API you created to configure Next.js for authentication.
 
-Back to our Nextjs `app` folder. Create a utils folder in the project and add a `auth0.js` file with the following content:
+Back to our Nextjs `app` folder. Create a `lib` folder in the project and add a `auth0.js` file with the following content:
 
 ```js
 import { initAuth0 } from '@auth0/nextjs-auth0';
@@ -48,7 +48,7 @@ The values that start and end with `<` and `>` respectively should be replaced w
 
 It is ok if it bothers you that `clientSecret` and `cookieSecret` should be in this file. This is a client project, right? You should never allow these kinds of credentials in a project that exposes them to the browser.
 
-Since Next.js does server-side rendering too, what we can do is make sure only the server layer of Next.js has access to it. Next.js only exposes pages to a client but does not allow access to other files in your project. Pages are anything in the `pages`  folder that is NOT in the `pages/api` folder. Since `pages` folder is the only way to expose content to the client, the credentials we have in `utils/auth0.js` will not leak to the client.
+Since Next.js does server-side rendering too, what we can do is make sure only the server layer of Next.js has access to it. Next.js only exposes pages to a client but does not allow access to other files in your project. Pages are anything in the `pages`  folder excluding the `pages/api` folder. Since `pages` folder is the only way to expose content to the client, the credentials we have in `lib/auth0.js` will not leak to the client.
 
 The value of the `audience` should be the value of your API identifier. Mine is `https://api.herm.dev`.
 
@@ -67,36 +67,50 @@ Let’s take our auth setup for a test drive.
 First things first, let’s login. Create a `pages/api` folder and add a `login.js` file:
 
 ```js
-import auth0 from '../../utils/auth0';
+import auth0 from '../../lib/auth0';
 
 export default async function login(req, res) {
   try {
     await auth0.handleLogin(req, res);
   } catch (error) {
     console.error(error);
-    res.status(error.status || 400).end(error.message);
+    res.status(error.status || 400).json({ error: "Something went wrong" });
   }
 }
 ```
 
 Next.js API is like a serverless function that lives in `pages/api`. You can use them for two things:
 
-
 1. Treat them like a server for your Next.js client pages
 2. Use them as proxies that intercept requests meant for another API
 
-In the `login` function, we are using it as a proxy because we can’t expose our Auth0 credentials in regular pages. What this function does is to use the configuration we setup in `utils/auth0` to send another request to the Auth0 server and authenticate a user.
+In the `login` function, we are using it as a proxy because we can’t expose our Auth0 credentials in regular pages. What this function does is to use the configuration we setup in `lib/auth0` to send another request to the Auth0 server and authenticate a user.
 
-The `auth0.handleLogin` makes the request to the Auth0 server. This method is exposed after we initialized the Auth0 SDK by calling the `initAuth0` function in the `utils/auth0` page.
+The `auth0.handleLogin` makes the request to the Auth0 server. This method is exposed after we initialized the Auth0 SDK by calling the `initAuth0` function in the `lib/auth0` page.
 
-Save and re-start the app with `npm run dev`, then go to http://localhost:3000/api/login
+Importing `lib/auth0` like this `../../lib/auth0` feels tedious. We can make the root of our project a base for importing so we can simply import like `lib/auth0`:
 
+Create a `jsconfig.json` at the root of your project and paste the following settings:
+
+```json
+{
+  "compilerOptions": {
+    "baseUrl": "."
+  }
+}
+```
+
+Then replace the import in `login.js with:
+
+```javascript
+import auth0 from 'lib/auth0';
+```
+
+Save and restart the app with `npm run dev`, then go to http://localhost:3000/api/login
 
 ![](https://paper-attachments.dropbox.com/s_7247E8EEE91ABF0A7C95DC19EDD6D99F253EF7CA1E6D49DA5837B7250FD633AA_1583654971938_image.png)
 
-
 You will be redirected to your Auth0 domain to Sign Up or Log in. Try signing up by clicking the **Sign Up** tab, entering your **email**, and **password** and click **SIGN UP** button.
-
 
 ![](https://paper-attachments.dropbox.com/s_7247E8EEE91ABF0A7C95DC19EDD6D99F253EF7CA1E6D49DA5837B7250FD633AA_1583655040183_image.png)
 
@@ -114,14 +128,14 @@ We are getting a 404 because we are yet to add a `pages/api/callback.js` to hand
 Add a `pages/api/callback.js` with the following:
 
 ```js
-import auth0 from '../../utils/auth0';
+import auth0 from 'lib/auth0';
 
 export default async function callback(req, res) {
   try {
     await auth0.handleCallback(req, res, { redirectTo: '/' });
   } catch (error) {
     console.error(error);
-    res.status(error.status || 400).end(error.message);
+    res.status(error.status || 400).json({ error: "Something went wrong" });
   }
 }
 ```
@@ -141,14 +155,14 @@ You can confirm that login was successful by going to the developer tools. When 
 To log out, add another api file named `logout.js` in the `api` folder:
 
 ```js
-import auth0 from '../../utils/auth0';
+import auth0 from 'lib/auth0';
 
 export default async function logout(req, res) {
   try {
     await auth0.handleLogout(req, res);
   } catch (error) {
     console.error(error);
-    res.status(error.status || 400).end(error.message);
+    res.status(error.status || 400).json({ error: "Something went wrong" });
   }
 }
 ```
@@ -191,7 +205,7 @@ The `dotenv` module is a node module that helps you parse credentials in `.env` 
 
 **Task 2: Create a Config File**
 
-It is a good practice to have a single general place where all your config lives and can change. Create a `config.js` file in the `utils` folder:
+It is a good practice to have a single general place where all your config lives and can change. Create a `config.js` file in the `lib` folder:
 
 ```js
 require('dotenv').config()
@@ -211,7 +225,7 @@ To attach the env variables on `process.env`, you need to require the `dotenv` m
 
 **Task 3: Use Config**
 
-You can use these configs in `utils/auth0.js`:
+You can use these configs in `lib/auth0.js`:
 
 ```js
   import { initAuth0 } from '@auth0/nextjs-auth0';

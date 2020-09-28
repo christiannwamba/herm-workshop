@@ -1,5 +1,5 @@
 ---
-title: "2.3 Database Tables"
+title: "2.4 Database Tables"
 metaTitle: "Database Tables"
 ---
 
@@ -23,8 +23,6 @@ Let’s make this model come to live on Hasura.
 - Learn how to add primary keys to tables
 - Add unique constraints to primary keys and fields like email and username
 
-
-
 ## Exercise 1: Create Account Table
 
 <iframe src="https://player.vimeo.com/video/388485997" width="640" height="564" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
@@ -32,7 +30,6 @@ Let’s make this model come to live on Hasura.
 **Task 1: Create an Account table**
 
 Click on the **Data** tab then click on the **Add Table** button:
-
 
 
 ![](https://paper-attachments.dropbox.com/s_3E94B2190A3BA2162BF331F8D8186E27E1E0F950AC3E66A083E4530ED6CD7B12_1580408766675_Screen+Shot+2020-01-30+at+10.18.11+AM.png)

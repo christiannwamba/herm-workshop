@@ -11,11 +11,34 @@ metaTitle: "Authenticated Queries from Next.js App"
 
 ## Exercise 1: Run a Query from Next.js
 
-In the beginning, when we set up the Next.js project, we used the Apollo GraphQL template. This setup installed Apollo and GraphQL libraries and even added a server-rendering logic for GraphQL queries in `lib/apollo.js`. Let’s use Apollo to fetch accounts from our protected GraphQL API.
+Let’s use Apollo GraphQL to fetch accounts from our protected GraphQL API.
+
+**Task 0: Install GraphQL Dependencies**
+
+Install all the GraphQL npm module that we need to use Apollo. Update the `dependencies` property in your `package.json` file:
+
+```json
+{
+  "@apollo/react-hooks": "3.0.0",
+  "@apollo/react-ssr": "3.0.0",
+  "apollo-cache-inmemory": "1.6.3",
+  "apollo-client": "2.6.4",
+  "apollo-link-http": "1.5.15",
+  "graphql": "^14.0.2",
+  "graphql-tag": "2.10.1",
+  "next-with-apollo": "^5.1.0"
+}
+```
+
+Install the dependencies:
+
+```javascript
+npm install
+```
 
 **Task 1: Create an Account Component**
 
-First create an `Account` component in `components/Account`:
+First create an `Account` component in `components/Account.js`:
 
 ```js
 import React from 'react';
@@ -67,7 +90,7 @@ const Account = () => {
 }
 ```
 
-`useQuery` returns an object that contains three different possible states of your query. If no response has yet been received, the `loading` state is true. If a response was received, but an error occurred, the information about that error is stored in `error`. Lastly, if a response was returned and nothing went wrong, the `data` property is populated with the payload or an empty array for empty tables.
+`useQuery` returns an object that contains three different possible states of your query. If no response has yet been received, the `loading` state is true. If a response was received, but an error occurred, the information about that error is stored in `error`. Lastly, if a response was returned and nothing went wrong, the `data` property stores the payload or an empty array for empty tables.
 
 Here is how to handle these 4 possible cases:
 
@@ -96,16 +119,52 @@ const Account = () => {
 
 Note that if there was a valid response, there is a possibility that the payload is empty and just sends an empty array. In that case, we should handle by checking the length of the response payload, `data.account.length`.
 
-**Task 2: Setup Home Page for Apollo**
+**Task 2: Setup SSR for Apollo**
+
+Create a `lib` folder at the root of your folder and add a `apollo.js` file inside the `lib` folder. Apollo needs extra configuration before it can render your queries to the server and that configuration is what you should put in the `apollo.js` file:
+
+```javascript
+import React from 'react'
+import { ApolloProvider } from '@apollo/react-hooks'
+import { ApolloClient } from 'apollo-client'
+import { InMemoryCache } from 'apollo-cache-inmemory'
+import { HttpLink } from 'apollo-link-http'
+import withApollo from 'next-with-apollo';
+
+export default withApollo(
+  ({ initialState }) => {
+    return new ApolloClient({
+      link: new HttpLink({
+        uri: `${process.env.BASE_URL}/api/graphql`,
+        credentials: 'same-origin'
+      }),
+      cache: new InMemoryCache().restore(initialState || {})
+    });
+  },
+  {
+    render: ({ Page, props }) => {
+      return (
+        <ApolloProvider client={props.apollo}>
+          <Page {...props} />
+        </ApolloProvider>
+      );
+    }
+  }
+);
+```
+
+For each page that needs to use GraphQL data, we have to wrap it with `withApollo` before exporting.
+
+**Task 4: Use Apollo SSR Setup in Home Page**
 
 To use the component, import it in the `index.js` page file:
 
 ```js
 import React from 'react';
-import fetch from 'node-fetch';
-import { Text } from 'herm';
+import { Text } from '@chakra-ui/core';
 
-+import { withApollo } from '../lib/apollo';
+import Layout from '../components/Layout';
++import withApollo from 'lib/apollo';
 +import Account from '../components/account';
 ```
 
@@ -121,28 +180,15 @@ You can now render the `Account` component in your `Index` component:
 function Index({ me }) {
   return (
     <Layout me={me}>
-      <Text fontSize="32px">Hello, {me.name}</Text>
+      <Text fontSize="40px" color="brand.500" as="h1">
+        Hello, {me.name}!
+      </Text>
 +     <Account />
     </Layout>
   );
 }
 ```
 
-The `./lib/apollo` is setup with a demo GraphQL endpoint — we need to update it to use ours. To do that, find the `createApolloClient` function and replace `uri` with your GraphQL endpoint (`http://localhost:3100/v1/graphql`):
-
-```js
-function createApolloClient(initialState = {}) {
-  return new ApolloClient({
-    ssrMode: typeof window === 'undefined',
-    link: new HttpLink({
-+     uri: `${process.env.BASE_URL}/api/graphql`,
-      credentials: 'same-origin',
-      fetch,
-    }),
-    cache: new InMemoryCache().restore(initialState),
-  })
-}
-```    
 
 If you reload the page, you should get the following error:
 
@@ -162,16 +208,16 @@ We need to find a way to intercept all API requests and add JWT to the requests'
 Create a `graphql.js` fine in `pages/api`. Just like other API functions we have created, it should have an async handler function:
 
 ```js
-import auth0 from '../../utils/auth0';
+import auth0 from 'lib/auth0';
 
-export default async function graphQL(req, res) {
+export default auth0.requireAuthentication(async function graphQL(req, res) {
   try {
     //...coming up next
   } catch (error) {
     console.error(error);
     res.status(error.status || 500).end(error.message);
   }
-}
+})
 ```   
 
 **Task 2: Get JWT from Incoming Request**
@@ -179,7 +225,7 @@ export default async function graphQL(req, res) {
 Use the `auth0` util to extract the token from the request calling this API:
 
 ```js
-import auth0 from '../../utils/auth0';
+import auth0 from 'lib/auth0';
 
 export default auth0.requireAuthentication(async function graphQL(req, res) {
   try {
@@ -206,10 +252,10 @@ The `getAccessToken` returns an object with the access token which is the user�
 Finally, use the `request` module to send a request to the GraphQL API and attach the token. When a response comes back, forward the response to the Next.js page that asked for it:
 
 ```js
-import request from 'request';
-import util from 'util';
-import auth0 from '../../utils/auth0';
-import config from '../../utils/config';
++import request from 'request';
++import util from 'util';
+ import auth0 from 'lib/auth0';
++import config from 'lib/config';
 
 export default auth0.requireAuthentication(async function graphQL(req, res) {
   try {    
@@ -260,7 +306,7 @@ The most important line where we are setting up the `Authorization` header:
 
 Since Next.js API is promise-based, we need to convert the `request.post` method to a promise, which is what `util.promisify` does. It takes a function with `func(err, cb){}` signature and turns it into a promise.
 
-Finally, we send a request to the GraphQL API and forward the response to Next.js page or whatever initiated a request to this Next.js API. The API endpoint is stored on the config object, so we need to update the config code in `utils/config.js`:
+Finally, we send a request to the GraphQL API and forward the response to Next.js page or whatever initiated a request to this Next.js API. The API endpoint is stored on the config object, so we need to update the config code in `lib/config.js`:
 
 ```js
 require('dotenv').config()
@@ -284,51 +330,7 @@ Restart the Next.js app and reload your page, you should start getting a success
 
 ![](https://paper-attachments.dropbox.com/s_1160B8630BA1CF41765159DA18D4020C2250C8909DFA5035D976331A3777F078_1584942845843_image.png)
 
-
-**Task 5: Refactor Apollo SSR Code**
-
-When I started this workshop, I did not know about the `next-with-apollo` npm library. This library will help us get rid of everything in `lib/apollo.js` and just call an imported function to setup Apollo.
-
-Delete everything in `lib/apollo.js` and replace with:
-
-```js
-import React from 'react'
-import { ApolloProvider } from '@apollo/react-hooks'
-import { ApolloClient } from 'apollo-client'
-import { InMemoryCache } from 'apollo-cache-inmemory'
-import { HttpLink } from 'apollo-link-http'
-
-import withApollo from 'next-with-apollo';
-
-
-export default withApollo(
-  ({ initialState }) => {
-    return new ApolloClient({
-      link: new HttpLink({
-        uri: `${process.env.BASE_URL}/api/graphql`,
-        credentials: 'same-origin'
-      }),
-      cache: new InMemoryCache().restore(initialState || {})
-    });
-  },
-  {
-    render: ({ Page, props }) => {
-      return (
-        <ApolloProvider client={props.apollo}>
-          <Page {...props} />
-        </ApolloProvider>
-      );
-    }
-  }
-);
-```
-
-You will keep getting the same expected result:
-
-![](https://paper-attachments.dropbox.com/s_1160B8630BA1CF41765159DA18D4020C2250C8909DFA5035D976331A3777F078_1585046669330_image.png)
-
-
-**Task 6: Test Query with Real Data**
+**Task 5: Test Query with Real Data**
 
 Head back to the Hasura console and run the following query:
 

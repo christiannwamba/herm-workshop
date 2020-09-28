@@ -39,8 +39,8 @@
     "lodash.startcase": "^4.4.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-feather": "^2.0.3",
-    "react-github-btn": "^1.1.1",
+    "react-feather": "^2.0.8",
+    "react-github-btn": "^1.2.0",
     "react-helmet": "^5.2.1",
     "react-id-generator": "^3.0.0",
     "react-instantsearch-dom": "^6.4.0",
@@ -56,6 +56,6 @@
   },
   "devDependencies": {
     "gatsby-plugin-remove-trailing-slashes": "^2.2.1",
-    "prism-react-renderer": "^1.0.2"
+    "prism-react-renderer": "^1.1.1"
   }
 }
