@@ -80,5 +80,5 @@ Sometimes I will intentionally run changes we made even when I know it is not go
 
 ## 5. Buy Before Building
 
-It is prevalent that a common problem has been solved in programming. Don’t reinvent. Buy does not mean spending money; it means to use what already exists. If it’s not open source but has a free plan or you can afford it, go for it. Trust me; your time is always more important than the money in the bank.
+It is prevalent that a common problem has been solved in programming. Don’t reinvent. _"Buy"_ does not mean spending money; it means to use what already exists. If it’s not open source but has a free plan or you can afford it, go for it. Trust me; your time is always more important than the money in the bank.
 
