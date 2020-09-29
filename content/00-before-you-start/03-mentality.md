@@ -17,7 +17,7 @@ When you have a strong opinion, do you ever stop to reflect on what it would hav
 
 I understand that it’s either:
 
-1. You are here to learning every single thing I am going to teach.
+1. You are here to learn every single thing I am going to teach.
 2. You are here for just one page to close your skill gap as a professional.
 
 This is why I decided to find a balance for both parties and make sure you get as much skills as you can from this workshop. To achieve this, here are some principles that will guide us:
