@@ -18,4 +18,5 @@ Let's celebrate everyone who is taking this workshop or has completed the worksh
 | Production link on Name | Github | Twitter | Completed? |
 | ----------------------- | ------ | ------- | ---------- |
 |[Christian Nwamba](https://hermapp.azurewebsites.net)         |christiannwamba        |codebeast         |    [ ]        |
+|[Ben Spaulding](https://benspaulding-hermapp.azurewebsites.net)         |benspaulding        |benspaulding         |    [ ]        |
 |                         |        |         |            |
