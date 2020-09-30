@@ -35,6 +35,8 @@ npm install -g create-next-app
 create-next-app app
 ```
 
+_Heads up!:_ If you have `yarn` installed on your system, `create-next-app` will set up your new app to use it as the package manager, rather than `npm`. In that case, every where you see `npm install --save ...` in these instructions you should instead run `yarn add ...`. Or if you want to stick with `npm` you can pass `create-next-app` a special flag, i.e., `create-next-app --use-npm --example with-apollo`.
+
 
 **Task 2: Run the Next.js app**
 

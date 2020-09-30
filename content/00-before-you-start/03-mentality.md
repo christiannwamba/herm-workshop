@@ -17,7 +17,7 @@ When you have a strong opinion, do you ever stop to reflect on what it would hav
 
 I understand that it’s either:
 
-1. You are here to learning every single thing I am going to teach.
+1. You are here to learn every single thing I am going to teach.
 2. You are here for just one page to close your skill gap as a professional.
 
 This is why I decided to find a balance for both parties and make sure you get as much skills as you can from this workshop. To achieve this, here are some principles that will guide us:
@@ -80,5 +80,5 @@ Sometimes I will intentionally run changes we made even when I know it is not go
 
 ## 5. Buy Before Building
 
-It is prevalent that a common problem has been solved in programming. Don’t reinvent. Buy does not mean spending money; it means to use what already exists. If it’s not open source but has a free plan or you can afford it, go for it. Trust me; your time is always more important than the money in the bank.
+It is prevalent that a common problem has been solved in programming. Don’t reinvent. _"Buy"_ does not mean spending money; it means to use what already exists. If it’s not open source but has a free plan or you can afford it, go for it. Trust me; your time is always more important than the money in the bank.
 

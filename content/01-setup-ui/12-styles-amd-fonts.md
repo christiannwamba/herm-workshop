@@ -102,6 +102,10 @@ export default class MyDocument extends Document {
             rel="preload"
             as="style"
           />
+          <link
+            href="https://fonts.googleapis.com/css?family=Nunito:400,600&display=swap"
+            rel="stylesheet"
+          />
         </Head>
         <body>
           <Main />
