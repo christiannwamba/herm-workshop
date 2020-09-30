@@ -1,5 +1,5 @@
 ---
-title: "2.6 Tables Relationship"
+title: "2.5 Tables Relationship"
 metaTitle: "Tables Relationship"
 ---
 
