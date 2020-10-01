@@ -1,5 +1,5 @@
 ---
-title: "2.6 Tables Relationship"
+title: "2.5 Tables Relationship"
 metaTitle: "Tables Relationship"
 ---
 
@@ -40,7 +40,7 @@ Add an `account_id` and `user_id` columns with an **integer** type. An integer t
 ![](https://paper-attachments.dropbox.com/s_818084DF86985F214D07736EAC56BFA386DB84F5EDD56671434B6943EBCA1FA8_1581016360032_image.png)
 
 
- 
+
 You should also add a primary key that is also an integer but with support for auto-increment. This will serve as the identifier and must always be unique.
 
 
